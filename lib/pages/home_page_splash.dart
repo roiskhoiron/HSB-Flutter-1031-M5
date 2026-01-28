@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../routes.dart';
 
-class SplashPage extends StatelessWidget {
-  const SplashPage({super.key});
+class HomeSplashPage extends StatelessWidget {
+  const HomeSplashPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +52,7 @@ class SplashPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    'Keep up your Health!',
+                    'Congratss!, you are all Set!',
                     style: TextStyle(
                       fontSize: 20,
                       fontStyle: FontStyle.italic,

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../routes.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+
+class HomePage2 extends StatelessWidget {
+  const HomePage2({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +19,7 @@ class HomePage extends StatelessWidget {
 
               /// progress bar
               LinearProgressIndicator(
-                value: 0.1,
+                value: 0.6,
                 backgroundColor: Colors.grey.shade300,
                 valueColor:
                 const AlwaysStoppedAnimation<Color>(Colors.blue),
@@ -28,21 +29,16 @@ class HomePage extends StatelessWidget {
 
               /// title
               const Text(
-                "What habbit you want to do?",
+                "When you wanna us remind you?",
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 6),
-              const Text(
-                "Select One or More",
-                style: TextStyle(color: Colors.black54),
-              ),
 
               const SizedBox(height: 24),
 
-              /// grid menu
+              /// reminder boxes (SAMA SEPERTI HOME_PAGE)
               Expanded(
                 child: GridView.count(
                   crossAxisCount: 2,
@@ -50,37 +46,18 @@ class HomePage extends StatelessWidget {
                   crossAxisSpacing: 16,
                   childAspectRatio: 1.1,
                   children: const [
-                    HabitCard(
-                      icon: Icons.camera_alt_outlined,
-                      label: "Take Picture",
+                    ReminderBox(
+                      time: "07:00",
+                      label: "Morning",
                     ),
-                    HabitCard(
-                      icon: Icons.fitness_center,
-                      label: "Workout",
+                    ReminderBox(
+                      time: "13:00",
+                      label: "Noon",
                     ),
-                    HabitCard(
-                      icon: Icons.edit_outlined,
-                      label: "Journaling",
-                    ),
-                    HabitCard(
-                      icon: Icons.calendar_month_outlined,
-                      label: "Planning",
-                    ),
-                    HabitCard(
-                      icon: Icons.sports_esports_outlined,
-                      label: "Game Tracking",
-                    ),
-                    HabitCard(
-                      icon: Icons.menu_book_outlined,
-                      label: "Reading",
-                    ),
-                    HabitCard(
-                      icon: Icons.music_note_outlined,
-                      label: "Music time",
-                    ),
-                    HabitCard(
-                      icon: Icons.bedtime_outlined,
-                      label: "Sleep Early",
+                    ReminderBox(
+                      time: "19:00",
+                      label: "Evening",
+                      isWide: true,
                     ),
                   ],
                 ),
@@ -88,7 +65,7 @@ class HomePage extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              /// bottom buttons
+              /// bottom buttons (STYLE SAMA HOME_PAGE)
               Row(
                 children: [
                   Expanded(
@@ -96,7 +73,8 @@ class HomePage extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         backgroundColor: Colors.white,
                         side: BorderSide.none,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding:
+                        const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: () {
                         Navigator.pushReplacementNamed(
@@ -115,12 +93,13 @@ class HomePage extends StatelessWidget {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        padding:
+                        const EdgeInsets.symmetric(vertical: 14),
                       ),
                       onPressed: () {
                         Navigator.pushReplacementNamed(
                           context,
-                          AppRoutes.homePage2,
+                          AppRoutes.homeSplashPage,
                         );
                       },
                       child: const Text(
@@ -142,21 +121,24 @@ class HomePage extends StatelessWidget {
 }
 
 /// =======================
-/// Habit Card Widget
+/// Reminder Box (STYLE SAMA HabitCard)
 /// =======================
-class HabitCard extends StatelessWidget {
-  final IconData icon;
+class ReminderBox extends StatelessWidget {
+  final String time;
   final String label;
+  final bool isWide;
 
-  const HabitCard({
+  const ReminderBox({
     super.key,
-    required this.icon,
+    required this.time,
     required this.label,
+    this.isWide = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: isWide ? double.infinity : null,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -164,12 +146,14 @@ class HabitCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            size: 60,
-            color: Colors.black,
+          Text(
+            time,
+            style: const TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           Text(
             label,
             style: const TextStyle(
