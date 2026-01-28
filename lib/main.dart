@@ -6,6 +6,7 @@ import 'pages/register_page.dart';
 import 'pages/home_page.dart';
 import 'pages/home_page2.dart';
 import 'pages/home_page_splash.dart';
+import 'pages/home_page_main.dart';
 
 void main() {
   runApp(const HabitlyApp());
@@ -27,6 +28,7 @@ class HabitlyApp extends StatelessWidget {
         AppRoutes.home: (context) => const HomePage(),
         AppRoutes.homePage2: (context) => const HomePage2(),
         AppRoutes.homeSplashPage: (context) => const HomeSplashPage(),
+        AppRoutes.homePageMain: (context) => const HomePageMain(),
       },
     );
   }

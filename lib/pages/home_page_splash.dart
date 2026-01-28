@@ -7,24 +7,25 @@ class HomeSplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFA7A7A7), // abu-abu
+      backgroundColor: const Color(0xFFA7A7A7),
       body: Column(
         children: [
-          // BAGIAN ATAS (LOGO)
+          // ===== BAGIAN ATAS =====
           Expanded(
-            flex: 6,
+            flex: 7,
             child: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(
-                    Icons.link, // placeholder logo
-                    size: 80,
-                    color: Colors.green,
+                children: [
+                  Image.asset(
+                    'assets/images/checkcircle.png',
+                    width: 240,
+                    height: 240,
                   ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Habitly',
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Congratss!, you are all Set!',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -36,47 +37,33 @@ class HomeSplashPage extends StatelessWidget {
             ),
           ),
 
-          // BAGIAN BAWAH (CARD PUTIH)
-          Expanded(
-            flex: 4,
-            child: Container(
+          // ===== TOMBOL BAWAH =====
+          Padding(
+            padding: const EdgeInsets.fromLTRB(70, 10, 70, 70),
+            child: SizedBox(
               width: double.infinity,
-              padding: const EdgeInsets.all(32),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(32),
+              height: 56,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacementNamed(
+                    context,
+                    AppRoutes.homePageMain,
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Congratss!, you are all Set!',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontStyle: FontStyle.italic,
-                    ),
+                child: const Text(
+                  'Start Tracking',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
                   ),
-                  const SizedBox(height: 32),
-
-                  // BUTTON PANAH
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushReplacementNamed(
-                          context, AppRoutes.login);
-                    },
-                    child: Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.black),
-                      ),
-                      child: const Icon(Icons.arrow_forward),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),

@@ -32,28 +32,18 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 48),
+              const SizedBox(height: 18),
 
               // LOGO
               Column(
-                children: const [
-                  Icon(
-                    Icons.link, // placeholder logo Habitly
-                    size: 72,
-                    color: Colors.green,
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    'Habitly',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                    ),
+                children: [
+                Image.asset(
+                'assets/images/aebbbec190680b790fb1afab99e36740075f92f4.png',
+                  width: 280,
+                  height: 280,
                   ),
                 ],
               ),
-
-              const SizedBox(height: 24),
 
               // TEXT
               const Text(

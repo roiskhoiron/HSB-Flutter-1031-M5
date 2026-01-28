@@ -16,20 +16,11 @@ class SplashPage extends StatelessWidget {
             child: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(
-                    Icons.link, // placeholder logo
-                    size: 80,
-                    color: Colors.green,
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'Habitly',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+                children: [
+                  Image.asset(
+                    'assets/images/aebbbec190680b790fb1afab99e36740075f92f4.png',
+                    width: 400,
+                    height: 400,
                   ),
                 ],
               ),

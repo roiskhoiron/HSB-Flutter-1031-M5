@@ -1,5 +1,5 @@
 name: mission_5_habbits
-description: "A new Flutter project."
+description: "Habit Tracker App"
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
@@ -11,20 +11,18 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  cupertino_icons: ^1.0.6
-
   flutter_lints: ^6.0.0
+  flutter_native_splash: ^2.4.0
 
 flutter:
   uses-material-design: true
   assets:
+    - assets/images/
     - assets/fonts/
   fonts:
     - family: Urbanist
@@ -34,3 +32,9 @@ flutter:
           weight: 500
         - asset: assets/fonts/Urbanist-Bold.ttf
           weight: 700
+
+flutter_native_splash:
+  color: "#A7A7A7"
+  image: assets/images/aebbbec190680b790fb1afab99e36740075f92f4.png
+  android: true
+  ios: true
