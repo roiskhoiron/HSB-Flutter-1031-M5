@@ -1,21 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const HomePageMain(),
-    );
-  }
-}
+import 'add_habit.dart'; // pastikan file ini ada
 
 class HomePageMain extends StatefulWidget {
   const HomePageMain({super.key});
@@ -27,30 +12,47 @@ class HomePageMain extends StatefulWidget {
 class _HomePageMainState extends State<HomePageMain> {
   int _selectedIndex = 0;
 
+  // List untuk menyimpan habit
+  List<Map<String, dynamic>> habits = [];
+
   // Navigasi bottom bar
-  void _onItemTapped(int index) {
+  void _onItemTapped(int index) async {
     setState(() {
       _selectedIndex = index;
-      if (index == 1) {
-        // Navigasi ke halaman tambah habit
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const AddHabitPage()),
-        );
-      }
     });
+
+    if (index == 1) {
+      // Navigasi ke halaman AddHabitPage
+      final newHabit = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const AddHabitPage()),
+      );
+
+      if (newHabit != null && newHabit is Map<String, dynamic>) {
+        setState(() {
+          habits.add(newHabit);
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     DateTime now = DateTime.now();
-    String month = DateFormat.MMMM().format(now); // Nama bulan
-    int day = now.day;
 
-    // Buat daftar hari dan tanggal minggu ini
+    // Daftar nama hari (Senin = M)
     List<String> weekDays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+    // Mulai minggu dari Senin
     DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-    List<int> weekDates = List.generate(7, (index) => startOfWeek.add(Duration(days: index)).day);
+
+    // List tanggal minggu ini
+    List<int> weekDates =
+    List.generate(7, (index) => startOfWeek.add(Duration(days: index)).day);
+
+    // List bulan tiap tanggal (untuk menampilkan bulan saat tanggal berubah bulan)
+    List<String> weekMonths =
+    List.generate(7, (index) => DateFormat.MMM().format(startOfWeek.add(Duration(days: index))));
 
     return Scaffold(
       body: SafeArea(
@@ -73,7 +75,7 @@ class _HomePageMainState extends State<HomePageMain> {
                     ),
                   ),
                   Text(
-                    '$month $day',
+                    '${DateFormat.MMMM().format(now)} ${now.day}',
                     style: const TextStyle(
                       fontSize: 18,
                       color: Colors.black54,
@@ -84,47 +86,52 @@ class _HomePageMainState extends State<HomePageMain> {
               const SizedBox(height: 20),
 
               // ===== HARI & TANGGAL =====
-              SizedBox(
+              Container(
                 height: 80,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 7,
-                  itemBuilder: (context, index) {
-                    bool isToday = weekDates[index] == now.day;
-                    return Container(
-                      margin: const EdgeInsets.only(right: 12),
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: isToday ? Colors.blue : Colors.grey[200],
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            weekDays[index],
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: isToday ? Colors.white : Colors.black54,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: List.generate(7, (index) {
+                    DateTime dayDate = startOfWeek.add(Duration(days: index));
+                    bool isToday =
+                        dayDate.day == now.day && dayDate.month == now.month;
+
+                    return Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 2),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 0),
+                        decoration: BoxDecoration(
+                          color: isToday ? Colors.blue : Colors.grey[200],
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              weekDays[index],
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: isToday ? Colors.white : Colors.black54,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${weekDates[index]}',
-                            style: TextStyle(
-                              color: isToday ? Colors.white : Colors.black54,
-                              fontWeight: FontWeight.bold,
+                            const SizedBox(height: 8),
+                            Text(
+                              '${dayDate.day}',
+                              style: TextStyle(
+                                color: isToday ? Colors.white : Colors.black54,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
-                  },
+                  }),
                 ),
               ),
               const SizedBox(height: 24),
 
-              // ===== MY HABBIT =====
+              // ===== MY HABIT =====
               const Text(
                 'My Habit',
                 style: TextStyle(
@@ -134,29 +141,30 @@ class _HomePageMainState extends State<HomePageMain> {
               ),
               const SizedBox(height: 12),
 
-              // Contoh list habit
+              // List My Habit
               Expanded(
-                child: ListView(
-                  children: const [
-                    Card(
+                child: habits.isEmpty
+                    ? const Center(child: Text('No habits yet'))
+                    : ListView.builder(
+                  itemCount: habits.length,
+                  itemBuilder: (context, index) {
+                    final habit = habits[index];
+
+                    String dateStr = habit['date'] != null
+                        ? DateFormat.yMMMd().format(habit['date'])
+                        : '';
+                    String timeStr = habit['time'] != null
+                        ? habit['time'].format(context)
+                        : '';
+
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 6),
                       child: ListTile(
-                        leading: Icon(Icons.check_circle_outline),
-                        title: Text('Meditation'),
+                        title: Text(habit['name']),
+                        subtitle: Text('$dateStr, $timeStr'),
                       ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        leading: Icon(Icons.check_circle_outline),
-                        title: Text('Reading'),
-                      ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        leading: Icon(Icons.check_circle_outline),
-                        title: Text('Exercise'),
-                      ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
             ],
@@ -182,21 +190,6 @@ class _HomePageMainState extends State<HomePageMain> {
             label: 'User',
           ),
         ],
-      ),
-    );
-  }
-}
-
-// ===== HALAMAN ADD HABBIT =====
-class AddHabitPage extends StatelessWidget {
-  const AddHabitPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Add New Habit')),
-      body: const Center(
-        child: Text('Halaman untuk menambahkan habit baru'),
       ),
     );
   }

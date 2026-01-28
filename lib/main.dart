@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mission_5_habbits/pages/add_habit.dart';
 import 'routes.dart';
 import 'pages/splash_page.dart';
 import 'pages/login_page.dart';
@@ -7,6 +8,7 @@ import 'pages/home_page.dart';
 import 'pages/home_page2.dart';
 import 'pages/home_page_splash.dart';
 import 'pages/home_page_main.dart';
+import 'pages/add_habit.dart';
 
 void main() {
   runApp(const HabitlyApp());
@@ -29,6 +31,7 @@ class HabitlyApp extends StatelessWidget {
         AppRoutes.homePage2: (context) => const HomePage2(),
         AppRoutes.homeSplashPage: (context) => const HomeSplashPage(),
         AppRoutes.homePageMain: (context) => const HomePageMain(),
+        AppRoutes.addHabitPage: (context) => const AddHabitPage(),
       },
     );
   }

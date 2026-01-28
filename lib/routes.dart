@@ -1,4 +1,3 @@
-
 class AppRoutes {
   static const loginsplash = '/';
   static const login = '/login';
@@ -7,4 +6,5 @@ class AppRoutes {
   static const homePage2 = '/home2';
   static const homeSplashPage = '/homesplash';
   static const homePageMain = '/homepagemain';
+  static const addHabitPage  = 'addhabitpage';
 }
