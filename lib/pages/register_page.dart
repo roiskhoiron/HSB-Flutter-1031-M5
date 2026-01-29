@@ -207,7 +207,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             foregroundColor: Colors.white, // ikon & teks saat ditekan
                             // overlayColor harus pakai MaterialStateProperty
                           ).copyWith(
-                            overlayColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
+                            overlayColor: WidgetStateProperty.all(Colors.white.withOpacity(0.1)),
                           ),
                           onPressed: () {
                             Navigator.pushReplacementNamed(context, AppRoutes.home);
@@ -262,7 +262,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _genderDropdown() {
     return DropdownButtonFormField<String>(
-      value: gender,
+      initialValue: gender,
       items: const [
         DropdownMenuItem(value: 'Female', child: Text('Female')),
         DropdownMenuItem(value: 'Male', child: Text('Male')),

@@ -191,7 +191,6 @@ class _SocialButton extends StatelessWidget {
     required this.text,
     required this.icon,
     this.iconSize = 24,
-    super.key,
   });
 
   @override
