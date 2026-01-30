@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../routes.dart';
+import '../theme/app_color.dart';
+import '../theme/app_text.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -24,110 +26,75 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFA7A7A7), // abu-abu
+      backgroundColor: isDark
+          ? AppColor.darkBackground
+          : AppColor.lightBackground,
+
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 18),
+              const SizedBox(height: 4),
 
-              // LOGO
-              Column(
-                children: [
-                Image.asset(
+              /// LOGO
+              Image.asset(
                 'assets/images/aebbbec190680b790fb1afab99e36740075f92f4.png',
-                  width: 280,
-                  height: 280,
-                  ),
-                ],
+                width: 260,
               ),
 
-              // TEXT
-              const Text(
+              const SizedBox(height: 4),
+
+              /// REGISTER TEXT
+              Text(
                 "Didn't have account ?",
-                style: TextStyle(fontSize: 14),
+                style: AppText.caption(context).copyWith(
+                  color: AppColor.black,
+                ),
               ),
               const SizedBox(height: 4),
-              GestureDetector(
+              InkWell(
                 onTap: () {
                   Navigator.pushNamed(context, AppRoutes.register);
                 },
-                child: const Text(
+                child: Text(
                   'Create one here!',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
-                  ),
+                  style: AppText.link(context),
                 ),
               ),
 
               const SizedBox(height: 32),
 
-              // EMAIL FIELD
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  hintText: 'email@domain.com',
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
+              /// EMAIL FIELD
+              _EmailField(controller: emailController),
 
               const SizedBox(height: 16),
 
-              // CONTINUE BUTTON
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: _continue,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Continue',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
+              /// CONTINUE BUTTON
+              _PrimaryButton(
+                text: 'Continue',
+                onPressed: _continue,
               ),
 
               const SizedBox(height: 24),
 
-              // OR
-              Row(
-                children: const [
-                  Expanded(child: Divider()),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text('or'),
-                  ),
-                  Expanded(child: Divider()),
-                ],
-              ),
+              /// OR DIVIDER
+              const _OrDivider(),
 
               const SizedBox(height: 16),
 
-              // GOOGLE BUTTON
-              _SocialButton(
+              /// SOCIAL BUTTONS
+              const _SocialButton(
                 text: 'Continue with Google',
                 icon: Icons.g_mobiledata,
                 iconSize: 34,
               ),
-
               const SizedBox(height: 12),
-
-              // APPLE BUTTON
-              _SocialButton(
+              const _SocialButton(
                 text: 'Continue with Apple',
                 icon: Icons.apple,
                 iconSize: 30,
@@ -135,43 +102,8 @@ class _LoginPageState extends State<LoginPage> {
 
               const SizedBox(height: 20),
 
-              Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: 'By clicking continue, you agree to our ',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black54,
-                      ),
-                    ),
-                    const TextSpan(
-                      text: 'Terms of Service\n',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const TextSpan(
-                      text: ' and ',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black54,
-                      ),
-                    ),
-                    const TextSpan(
-                      text: 'Privacy Policy',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                textAlign: TextAlign.center,
-              ),
+              /// TERMS
+              const _TermsText(),
 
               const SizedBox(height: 24),
             ],
@@ -182,6 +114,67 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
+/// Email Field
+class _EmailField extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _EmailField({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      style: AppText.body(context),
+      decoration: InputDecoration(
+        hintText: 'email@domain.com',
+        hintStyle: TextStyle(
+          color: AppColor.black38,
+          fontFamily: 'Urbanist'
+        ),
+        filled: true,
+        fillColor: AppColor.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+}
+
+///Primary Button
+class _PrimaryButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+
+  const _PrimaryButton({
+    required this.text,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 48,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColor.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Text(
+          text,
+          style: AppText.button(context),
+        ),
+      ),
+    );
+  }
+}
+
+///Social Button
 class _SocialButton extends StatelessWidget {
   final String text;
   final IconData icon;
@@ -198,41 +191,93 @@ class _SocialButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: 48,
-      child: ElevatedButton(
-        clipBehavior: Clip.antiAlias, //  supaya radius benar-benar kepotong
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          elevation: 0,
-          side: const BorderSide(
-            color: Colors.black12,
+      child: OutlinedButton(
+        onPressed: () {},
+        style: OutlinedButton.styleFrom(
+          backgroundColor: AppColor.white,
+          foregroundColor: AppColor.black,
+          side: BorderSide(
+            color: AppColor.grey.shade300,
             width: 1,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12), //  SAMA DENGAN CONTINUE
+            borderRadius: BorderRadius.circular(12),
           ),
+          overlayColor: AppColor.black.withOpacity(0.05), // ripple
         ),
-        onPressed: () {},
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: iconSize,
-              color: Colors.black,
-            ),
+            Icon(icon, size: iconSize),
             const SizedBox(width: 12),
             Text(
               text,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black,
-                fontWeight: FontWeight.w500,
-              ),
+              style: AppText.body(context), // aman
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+///Divider OR
+class _OrDivider extends StatelessWidget {
+  const _OrDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: const [
+        Expanded(child: Divider(
+            color: AppColor.grey,
+          )
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: Text('or'),
+        ),
+        Expanded(child: Divider(
+          color: AppColor.grey,
+          )
+        ),
+      ],
+    );
+  }
+}
+
+///Term Text
+class _TermsText extends StatelessWidget {
+  const _TermsText();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      TextSpan(
+        style: AppText.caption(context),
+        children: const [
+          TextSpan(
+            text: 'By clicking continue, you agree to our ',
+            style: TextStyle(fontWeight: FontWeight.normal)
+          ),
+          TextSpan(
+            text: 'Terms of Service\n',
+            style: const TextStyle(
+                fontWeight: FontWeight.normal,
+                color: Colors.black,
+            ),
+          ),
+          TextSpan(text: 'and '),
+          TextSpan(
+            text: 'Privacy Policy',
+            style: const TextStyle(
+                fontWeight: FontWeight.normal,
+                color: Colors.black,
+            ),
+          ),
+        ],
+      ),
+      textAlign: TextAlign.center,
     );
   }
 }

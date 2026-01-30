@@ -1,32 +1,49 @@
 import 'package:flutter/material.dart';
+import 'app_color.dart';
 
 class AppTheme {
-  static const Color primaryGreen = Color(0xFF2FB969);
-  static const Color lightBackground = Color(0xFFE3FFDB);
-  static const Color darkBackground = Color(0xFFA7A7A7);
-
   static ThemeData lightTheme = ThemeData(
-    scaffoldBackgroundColor: lightBackground,
-    primaryColor: primaryGreen,
+    brightness: Brightness.light,
+    scaffoldBackgroundColor: AppColor.lightBackground,
     fontFamily: 'Urbanist',
-    appBarTheme: const AppBarTheme(
-      backgroundColor: primaryGreen,
-      foregroundColor: Colors.white,
-      elevation: 0,
+
+    colorScheme: const ColorScheme.light(
+      primary: AppColor.primary,
+      background: AppColor.lightBackground,
     ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: primaryGreen,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
+
+    appBarTheme: const AppBarTheme(
+      backgroundColor: AppColor.lightBackground,
+      elevation: 0,
+      foregroundColor: Colors.black,
+    ),
+
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: AppColor.lightBackground,
+      selectedItemColor: AppColor.primary,
+      unselectedItemColor: Colors.grey,
     ),
   );
 
   static ThemeData darkTheme = ThemeData(
-    scaffoldBackgroundColor: darkBackground,
-    fontFamily: 'Urbanist',
     brightness: Brightness.dark,
+    scaffoldBackgroundColor: AppColor.darkBackground,
+    fontFamily: 'Urbanist',
+
+    colorScheme: const ColorScheme.dark(
+      background: AppColor.darkBackground,
+    ),
+
+    appBarTheme: const AppBarTheme(
+      backgroundColor: AppColor.darkBackground,
+      elevation: 0,
+      foregroundColor: Colors.black,
+    ),
+
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: AppColor.darkBackground,
+      selectedItemColor: Colors.black,
+      unselectedItemColor: Colors.black54,
+    ),
   );
 }

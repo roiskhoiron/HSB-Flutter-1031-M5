@@ -8,8 +8,8 @@ import 'pages/home_page.dart';
 import 'pages/home_page2.dart';
 import 'pages/home_page_splash.dart';
 import 'pages/home_page_main.dart';
+import 'theme/app_theme.dart';
 
-// Buat ValueNotifier global untuk theme
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
 void main() {
@@ -27,10 +27,13 @@ class HabitlyApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Habitly',
-          theme: ThemeData.light(),
-          darkTheme: ThemeData.dark(),
-          themeMode: currentMode, // <-- ini akan rebuild saat berubah
+
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: currentMode,
+
           initialRoute: AppRoutes.loginsplash,
+
           routes: {
             AppRoutes.loginsplash: (context) => const SplashPage(),
             AppRoutes.login: (context) => const LoginPage(),

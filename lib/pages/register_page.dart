@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mission_5_habbits/routes.dart';
+import '../routes.dart';
+import '../theme/app_color.dart';
+import '../theme/app_text.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -12,208 +14,170 @@ class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   String gender = 'Female';
 
-  final BorderRadius _radius = BorderRadius.circular(8);
+  final BorderRadius _radius = BorderRadius.circular(12);
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFA7A7A7),
+      backgroundColor:
+      isDark ? AppColor.darkBackground : AppColor.lightBackground,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(12),
           child: Column(
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 2),
 
               /// ===== LOGO =====
               Column(
-                children: const [
-                  Icon(
-                    Icons.link,
-                    size: 64,
-                    color: Color(0xFF2FB969),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Habitly',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
+                children: [
+                  Image.asset(
+                    'assets/images/aebbbec190680b790fb1afab99e36740075f92f4.png',
+                    width: 200,
                   ),
                 ],
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 4),
 
               /// ===== FORM CARD =====
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(16),
+                  color: AppColor.black,
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Center(
+                      Center(
                         child: Text(
                           'Account Register',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      _label('Full Name'),
-                      _input(),
-
-                      _label('Email'),
-                      _input(),
-
-                      _label('Jenis Kelamin'),
-                      _genderDropdown(),
-
-                      _label('Mobile'),
-                      Row(
-                        children: [
-                          _CountryCode(),
-                          const SizedBox(width: 8),
-                          Expanded(child: _input()),
-                        ],
-                      ),
-
-                      _label('Password'),
-                      _input(obscure: true),
-
-                      _label('Confirm Password'),
-                      _input(obscure: true),
-
-                      const SizedBox(height: 10),
-
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          'Forgot Password?',
-                          style: TextStyle(color: Colors.grey.shade300),
+                          style: AppText.title(context)
+                              .copyWith(color: AppColor.white),
                         ),
                       ),
 
                       const SizedBox(height: 20),
 
-                      /// REGISTER BUTTON
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF2FB969), // hijau
-                            foregroundColor: Colors.white, // teks putih
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: _radius,
-                            ),
+                      _label(context, 'Full Name'),
+                      InputField(),
+
+                      _label(context, 'Email'),
+                      InputField(),
+
+                      _label(context, 'Gender'),
+                      _genderDropdown(),
+
+                      _label(context, 'Mobile'),
+                      Row(
+                        children: [
+                          _CountryCode(radius: _radius),
+                          const SizedBox(width: 8),
+                          Expanded(child: InputField()),
+                        ],
+                      ),
+
+                      _label(context, 'Password'),
+                      InputField(obscure: true, isPassword: true),
+
+                      _label(context, 'Confirm Password'),
+                      InputField(obscure: true, isPassword: true),
+
+                      const SizedBox(height: 12),
+
+                      Container(
+                        alignment: Alignment.centerRight,
+                        child: InkWell(
+                          onTap: (){}, ///Belum ada Navigasi
+                        child: Text(
+                          'Forgot Password?',
+                          style: AppText.caption(context)
+                              .copyWith(color: AppColor.grey.shade300),
                           ),
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              Navigator.pushReplacementNamed(context, AppRoutes.home);
-                            }
-                          },
-                          child: const Text('Register'),
                         ),
                       ),
 
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 24),
+
+                      /// REGISTER BUTTON
+                      _PrimaryButton(
+                        text: 'Register',
+                        color: AppColor.primary,
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            Navigator.pushReplacementNamed(
+                                context, AppRoutes.home);
+                          }
+                        },
+                      ),
+
+                      const SizedBox(height: 16),
 
                       /// LOGIN BUTTON
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Color(0xFF42A5F5),
-                            // warna teks
-                            side: BorderSide(color: Color(0xFF81C784)),
-                            // border hijau soft
-                            backgroundColor: Color(0xFF81C784),
-                            // background hijau tipis
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: _radius,
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/login');
-                          },
-                          child: const Text('Login'),
-                        ),
+                      _PrimaryButton(
+                        text: 'Login',
+                        color: const Color(0xFFE2FCD9),
+                        onPressed: () {
+                          Navigator.pushNamed(context, AppRoutes.login);
+                        },
                       ),
 
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 20),
 
                       /// OR
                       Row(
                         children: [
                           Expanded(
-                            child: Container(
-                              margin: const EdgeInsets.only(right: 8),
-                              child: Divider(
-                                color: Colors.white, // garis putih
-                                thickness: 1.5, // tebal garis
-                              ),
-                            ),
+                            child: Divider(color: AppColor.white),
                           ),
-                          const Text(
-                            'Or',
-                            style: TextStyle(color: Colors.white),
+                          Padding(
+                            padding:
+                            const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              'Or',
+                              style: AppText.caption(context)
+                                  .copyWith(color: AppColor.grey),
+                            ),
                           ),
                           Expanded(
-                            child: Container(
-                              margin: const EdgeInsets.only(left: 8),
-                              child: Divider(
-                                color: Colors.white, // garis putih
-                                thickness: 1.5, // tebal garis
-                              ),
-                            ),
+                            child: Divider(color: AppColor.white),
                           ),
                         ],
                       ),
 
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 20),
 
                       /// GOOGLE BUTTON
                       SizedBox(
                         width: double.infinity,
                         child: OutlinedButton.icon(
-                          icon: const Icon(
-                            Icons.g_mobiledata,
-                            size: 28,
-                            color: Colors.white,
-                          ),
-                          label: const Text(
-                            'Sign in with Google',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.white),
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: _radius,
-                            ),
-                            foregroundColor: Colors.white, // ikon & teks saat ditekan
-                            // overlayColor harus pakai MaterialStateProperty
-                          ).copyWith(
-                            overlayColor: WidgetStateProperty.all(Colors.white.withOpacity(0.1)),
-                          ),
                           onPressed: () {
                             Navigator.pushReplacementNamed(context, AppRoutes.home);
                           },
+                          icon: const Icon(
+                            Icons.g_mobiledata,
+                            size: 28,
+                            color: AppColor.white,
+                          ),
+                          label: Text(
+                            'Sign in with Google',
+                            style: AppText.body(context).copyWith(color: AppColor.white),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: AppColor.white),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            alignment: Alignment.center, // ⬅️ ini opsional tapi rapi
+                          ),
                         ),
-                      ),
+                      )
                     ],
                   ),
                 ),
@@ -227,13 +191,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
   /// ===== COMPONENTS =====
 
-  Widget _label(String text) {
+  Widget _label(BuildContext context, String text) {
     return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 6),
+      padding: const EdgeInsets.only(top: 12, bottom: 6),
       child: RichText(
         text: TextSpan(
           text: text,
-          style: const TextStyle(color: Colors.white),
+          style:
+          AppText.caption(context).copyWith(color: AppColor.white),
           children: const [
             TextSpan(
               text: ' *',
@@ -245,24 +210,75 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _input({bool obscure = false}) {
-    return TextFormField(
-      obscureText: obscure,
-      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: _radius,
-          borderSide: BorderSide.none,
+  // Widget _input({bool obscure = false, bool isPassword = false}) {
+  //   return TextFormField(
+  //     obscureText: obscure,
+  //     validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+  //     decoration: InputDecoration(
+  //       filled: true,
+  //       fillColor: AppColor.white,
+  //       border: OutlineInputBorder(
+  //         borderRadius: _radius,
+  //         borderSide: BorderSide.none,
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Widget _input({
+    bool obscure = false,
+    bool isPassword = false, // default false, biar form lama aman
+  }) {
+    if (isPassword) {
+      // Password field dengan show/hide
+      return StatefulBuilder(
+        builder: (context, setState) {
+          bool _obscureText = obscure;
+          return TextFormField(
+            obscureText: _obscureText,
+            validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: AppColor.white,
+              border: OutlineInputBorder(
+                borderRadius: _radius,
+                borderSide: BorderSide.none,
+              ),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscureText ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.grey,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _obscureText = !_obscureText;
+                  });
+                },
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      // Field biasa, tetap kompatibel dengan form lama
+      return TextFormField(
+        obscureText: obscure,
+        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: AppColor.white,
+          border: OutlineInputBorder(
+            borderRadius: _radius,
+            borderSide: BorderSide.none,
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   Widget _genderDropdown() {
     return DropdownButtonFormField<String>(
-      initialValue: gender,
+      value: gender,
       items: const [
         DropdownMenuItem(value: 'Female', child: Text('Female')),
         DropdownMenuItem(value: 'Male', child: Text('Male')),
@@ -270,7 +286,7 @@ class _RegisterPageState extends State<RegisterPage> {
       onChanged: (v) => setState(() => gender = v!),
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: AppColor.white,
         border: OutlineInputBorder(
           borderRadius: _radius,
           borderSide: BorderSide.none,
@@ -278,21 +294,143 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
     );
   }
+}
 
-  Widget _CountryCode() {
+/// ===== SMALL WIDGETS =====
+
+class _CountryCode extends StatelessWidget {
+  final BorderRadius radius;
+
+  const _CountryCode({required this.radius});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: _radius,
+        color: AppColor.white,
+        borderRadius: radius,
       ),
-      child: Row(
+      child: const Row(
         mainAxisSize: MainAxisSize.min,
-        children: const [
-          Text('🇮🇩', style: TextStyle(fontSize: 16)), // bendera
+        children: [
+          Text('🇮🇩', style: TextStyle(fontSize: 16)),
           SizedBox(width: 4),
           Text('+62', style: TextStyle(fontWeight: FontWeight.bold)),
         ],
+      ),
+    );
+  }
+}
+
+class _PrimaryButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final bool outlined;
+  final FontWeight? fontWeight;
+  final Color? color;
+
+  const _PrimaryButton({
+    required this.text,
+    required this.onPressed,
+    this.outlined = false,
+    this.fontWeight,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: outlined
+          ? OutlinedButton(
+        onPressed: onPressed,
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: AppColor.white),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding:
+          const EdgeInsets.symmetric(vertical: 14),
+        ),
+        child: Text(
+          text,
+          style: AppText.body(context)
+              .copyWith(color: AppColor.white),
+        ),
+      )
+          : ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color ?? AppColor.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding:
+          const EdgeInsets.symmetric(vertical: 14),
+        ),
+        child: Text(
+          text,
+          style: AppText.body(context)
+              .copyWith(color: AppColor.white),
+        ),
+      ),
+    );
+  }
+}
+
+
+class InputField extends StatefulWidget {
+  final bool obscure;
+  final bool isPassword;
+  final TextEditingController? controller;
+
+  const InputField({
+    super.key,
+    this.obscure = false,
+    this.isPassword = false,
+    this.controller,
+  });
+
+  @override
+  State<InputField> createState() => _InputFieldState();
+}
+
+class _InputFieldState extends State<InputField> {
+  late bool _obscureText;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscureText = widget.obscure;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: widget.controller,
+      obscureText: widget.isPassword ? _obscureText : false,
+      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white, // ganti sesuai AppColor.white
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        suffixIcon: widget.isPassword
+            ? IconButton(
+          icon: Icon(
+            _obscureText ? Icons.visibility_off : Icons.visibility,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            setState(() {
+              _obscureText = !_obscureText;
+            });
+          },
+        )
+            : null,
       ),
     );
   }
