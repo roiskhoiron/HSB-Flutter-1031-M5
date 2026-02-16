@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
 import 'package:mission_5_habbits/pages/add_habit.dart';
+import 'package:mission_5_habbits/models/habit.dart';
+
 import 'routes.dart';
 import 'pages/splash_page.dart';
 import 'pages/login_page.dart';
@@ -9,11 +14,21 @@ import 'pages/home_page2.dart';
 import 'pages/home_page_splash.dart';
 import 'pages/home_page_main.dart';
 import 'theme/app_theme.dart';
+import 'pages/add_habit.dart';
 
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
-void main() {
-  runApp(const HabitlyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+  Hive.registerAdapter(HabitAdapter());
+  await Hive.openBox<Habit>('habitsBox');
+
+  runApp(const ProviderScope(
+    child: HabitlyApp(),
+    ),
+  );
 }
 
 class HabitlyApp extends StatelessWidget {
@@ -42,7 +57,7 @@ class HabitlyApp extends StatelessWidget {
             AppRoutes.homePage2: (context) => const HomePage2(),
             AppRoutes.homeSplashPage: (context) => const HomeSplashPage(),
             AppRoutes.homePageMain: (context) => const HomePageMain(),
-            AppRoutes.addHabitPage: (context) => const AddHabitPage(),
+            // AppRoutes.addHabitPage: (context) => AddHabit(),
           },
         );
       },

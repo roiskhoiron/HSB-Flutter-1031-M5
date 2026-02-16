@@ -1,206 +1,136 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:mission_5_habbits/pages/home_page.dart';
+import '../providers/habit_provider.dart';
 import 'package:mission_5_habbits/pages/user_page.dart';
-import 'add_habit.dart';
 
-class HomePageMain extends StatefulWidget {
+class HomePageMain extends ConsumerStatefulWidget {
   const HomePageMain({super.key});
 
   @override
-  State<HomePageMain> createState() => _HomePageMainState();
+  ConsumerState<HomePageMain> createState() => _HomePageMainState();
 }
 
-class _HomePageMainState extends State<HomePageMain> {
+class _HomePageMainState extends ConsumerState<HomePageMain> {
   int _selectedIndex = 0;
 
-  List<Map<String, dynamic>> habits = [];
+  void _onItemTapped(int index) {
+    if (index == 1) {
+      _showAddDialog();
+      return;
+    }
 
-  void _onItemTapped(int index) async {
     setState(() {
       _selectedIndex = index;
     });
+  }
 
-    if (index == 0) {
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const HomePage()),
-      );
-    }
+  void _showAddDialog() {
+    final controller = TextEditingController();
+    DateTime? selectedDate;
+    TimeOfDay? selectedTime;
 
-    if (index == 1) {
-      final newHabit = await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const AddHabitPage()),
-      );
+    showDialog(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text("Tambah Habit"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  hintText: "Masukkan nama habit",
+                ),
+              ),
+              const SizedBox(height: 12),
+              ListTile(
+                title: Text(selectedDate == null
+                    ? "Select Date"
+                    : DateFormat.yMMMMd().format(selectedDate!)),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: () async {
+                  final now = DateTime.now();
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate ?? now,
+                    firstDate: now,
+                    lastDate: DateTime(now.year + 5),
+                  );
+                  if (date != null) setState(() => selectedDate = date);
+                },
+              ),
+              ListTile(
+                title: Text(selectedTime == null
+                    ? "Select Time"
+                    : selectedTime!.format(context)),
+                trailing: const Icon(Icons.access_time),
+                onTap: () async {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime: selectedTime ?? TimeOfDay.now(),
+                  );
+                  if (time != null) setState(() => selectedTime = time);
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final text = controller.text.trim();
+                if (text.isEmpty || selectedDate == null || selectedTime == null) {
+                  return;
+                }
 
-      if (newHabit != null && newHabit is Map<String, dynamic>) {
-        setState(() {
-          habits.add(newHabit);
-        });
-      }
-    }
+                final success = await ref.read(habitProvider.notifier).addHabitWithDateTime(
+                  title: text,
+                  date: selectedDate!,
+                  hour: selectedTime!.hour,
+                  minute: selectedTime!.minute,
+                );
 
-    if (index == 2) {
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const UserPage()),
-      );
-    }
+                if (success) {
+                  Navigator.pop(context);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("$text added!")),
+                    );
+                  }
+                } else {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Habit already exists")),
+                    );
+                  }
+                }
+              },
+              child: const Text("Tambah"),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    DateTime now = DateTime.now();
-
-    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final pages = [
+      const _HomeContent(),
+      const SizedBox(), // dummy for add button
+      const UserPage(),
+    ];
 
     return Scaffold(
       backgroundColor: Colors.grey.shade300,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-
-              /// ===== HEADER =====
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      style: const TextStyle(color: Colors.black),
-                      children: [
-                        const TextSpan(
-                          text: 'Today,\n',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        TextSpan(
-                          text: DateFormat('MMMM d').format(now),
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(Icons.person_outline, size: 28),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              /// ===== WEEK CALENDAR =====
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(7, (index) {
-                  final day =
-                  startOfWeek.add(Duration(days: index));
-                  final isToday =
-                      day.day == now.day && day.month == now.month;
-
-                  return Column(
-                    children: [
-                      Text(
-                        DateFormat('E').format(day)[0],
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                      const SizedBox(height: 6),
-                      Container(
-                        width: 34,
-                        height: 34,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: isToday
-                              ? Colors.black
-                              : Colors.grey.shade400,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          '${day.day}',
-                          style: TextStyle(
-                            color:
-                            isToday ? Colors.white : Colors.black,
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                }),
-              ),
-
-              const SizedBox(height: 32),
-
-              /// ===== MY HABIT =====
-              const Text(
-                'My Habbit',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              /// ===== HABIT LIST =====
-              Expanded(
-                child: habits.isEmpty
-                    ? const Center(
-                  child: Text(
-                    'No habits yet',
-                    style: TextStyle(color: Colors.black54),
-                  ),
-                )
-                    : ListView.separated(
-                  itemCount: habits.length,
-                  separatorBuilder: (_, __) =>
-                      Divider(color: Colors.grey.shade500),
-                  itemBuilder: (context, index) {
-                    final habit = habits[index];
-
-                    String subtitle = '';
-                    if (habit['time'] is TimeOfDay) {
-                      subtitle =
-                      'Completed at ${habit['time'].format(context)}';
-                    }
-
-                    return Padding(
-                      padding:
-                      const EdgeInsets.symmetric(vertical: 8),
-                      child: Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            habit['name'] ?? '',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            subtitle,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Colors.black54,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-
-      /// ===== BOTTOM NAV =====
+      body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
@@ -218,6 +148,148 @@ class _HomePageMainState extends State<HomePageMain> {
             label: 'User',
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// =======================
+/// HOME CONTENT
+/// =======================
+class _HomeContent extends ConsumerWidget {
+  const _HomeContent();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final habitsAsync = ref.watch(habitProvider);
+    DateTime now = DateTime.now();
+    DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 20),
+
+            /// HEADER
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    style: const TextStyle(color: Colors.black),
+                    children: [
+                      const TextSpan(
+                        text: 'Today,\n',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      TextSpan(
+                        text: DateFormat('MMMM d').format(now),
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.person_outline, size: 28),
+              ],
+            ),
+
+            const SizedBox(height: 24),
+
+            /// WEEK CALENDAR
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(7, (index) {
+                final day = startOfWeek.add(Duration(days: index));
+                final isToday = day.day == now.day && day.month == now.month;
+
+                return Column(
+                  children: [
+                    Text(
+                      DateFormat('E').format(day)[0],
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      width: 34,
+                      height: 34,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: isToday ? Colors.black : Colors.grey.shade400,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        '${day.day}',
+                        style: TextStyle(
+                          color: isToday ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }),
+            ),
+
+            const SizedBox(height: 32),
+
+            const Text(
+              'My Habit',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            /// HABIT LIST
+            Expanded(
+              child: habitsAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Center(child: Text("Error: $e")),
+                data: (habits) {
+                  if (habits.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'No habits yet ✨',
+                        style: TextStyle(color: Colors.black54),
+                      ),
+                    );
+                  }
+
+                  return ListView.separated(
+                    itemCount: habits.length,
+                    separatorBuilder: (_, __) => Divider(color: Colors.grey.shade500),
+                    itemBuilder: (context, index) {
+                      final habit = habits[index];
+
+                      return ListTile(
+                        title: Text(habit.title),
+                        leading: Checkbox(
+                          value: habit.isCompleted,
+                          onChanged: (_) {
+                            ref.read(habitProvider.notifier).toggleHabit(habit.id);
+                          },
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () {
+                            ref.read(habitProvider.notifier).deleteHabit(habit.id);
+                          },
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

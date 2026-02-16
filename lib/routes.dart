@@ -6,5 +6,5 @@ class AppRoutes {
   static const homePage2 = '/home2';
   static const homeSplashPage = '/homesplash';
   static const homePageMain = '/homepagemain';
-  static const addHabitPage  = 'addhabitpage';
+  static const addHabitPage  = '/addhabit';
 }

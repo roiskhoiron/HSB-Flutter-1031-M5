@@ -16,6 +16,22 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final BorderRadius _radius = BorderRadius.circular(12);
 
+  final fullNameController = TextEditingController();
+  final emailController = TextEditingController();
+  final mobileController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+
+  @override
+  void dispose() {
+    fullNameController.dispose();
+    emailController.dispose();
+    mobileController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -25,24 +41,20 @@ class _RegisterPageState extends State<RegisterPage> {
       isDark ? AppColor.darkBackground : AppColor.lightBackground,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              const SizedBox(height: 2),
+              const SizedBox(height: 8),
 
-              /// ===== LOGO =====
-              Column(
-                children: [
-                  Image.asset(
-                    'assets/images/aebbbec190680b790fb1afab99e36740075f92f4.png',
-                    width: 200,
-                  ),
-                ],
+              /// LOGO
+              Image.asset(
+                'assets/images/aebbbec190680b790fb1afab99e36740075f92f4.png',
+                width: 200,
               ),
 
-              const SizedBox(height: 4),
+              const SizedBox(height: 12),
 
-              /// ===== FORM CARD =====
+              /// FORM CARD
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -65,10 +77,10 @@ class _RegisterPageState extends State<RegisterPage> {
                       const SizedBox(height: 20),
 
                       _label(context, 'Full Name'),
-                      InputField(),
+                      InputField(controller: fullNameController),
 
                       _label(context, 'Email'),
-                      InputField(),
+                      InputField(controller: emailController),
 
                       _label(context, 'Gender'),
                       _genderDropdown(),
@@ -78,28 +90,32 @@ class _RegisterPageState extends State<RegisterPage> {
                         children: [
                           _CountryCode(radius: _radius),
                           const SizedBox(width: 8),
-                          Expanded(child: InputField()),
+                          Expanded(
+                            child: InputField(
+                              controller: mobileController,
+                            ),
+                          ),
                         ],
                       ),
 
                       _label(context, 'Password'),
-                      InputField(obscure: true, isPassword: true),
+                      InputField(
+                        controller: passwordController,
+                        obscure: true,
+                        isPassword: true,
+                      ),
 
                       _label(context, 'Confirm Password'),
-                      InputField(obscure: true, isPassword: true),
-
-                      const SizedBox(height: 12),
-
-                      Container(
-                        alignment: Alignment.centerRight,
-                        child: InkWell(
-                          onTap: (){}, ///Belum ada Navigasi
-                        child: Text(
-                          'Forgot Password?',
-                          style: AppText.caption(context)
-                              .copyWith(color: AppColor.grey.shade300),
-                          ),
-                        ),
+                      InputField(
+                        controller: confirmPasswordController,
+                        obscure: true,
+                        isPassword: true,
+                        customValidator: (value) {
+                          if (value != passwordController.text) {
+                            return 'Password tidak sama';
+                          }
+                          return null;
+                        },
                       ),
 
                       const SizedBox(height: 24),
@@ -107,7 +123,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       /// REGISTER BUTTON
                       _PrimaryButton(
                         text: 'Register',
-                        color: AppColor.primary,
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             Navigator.pushReplacementNamed(
@@ -126,58 +141,6 @@ class _RegisterPageState extends State<RegisterPage> {
                           Navigator.pushNamed(context, AppRoutes.login);
                         },
                       ),
-
-                      const SizedBox(height: 20),
-
-                      /// OR
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Divider(color: AppColor.white),
-                          ),
-                          Padding(
-                            padding:
-                            const EdgeInsets.symmetric(horizontal: 8),
-                            child: Text(
-                              'Or',
-                              style: AppText.caption(context)
-                                  .copyWith(color: AppColor.grey),
-                            ),
-                          ),
-                          Expanded(
-                            child: Divider(color: AppColor.white),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      /// GOOGLE BUTTON
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(context, AppRoutes.home);
-                          },
-                          icon: const Icon(
-                            Icons.g_mobiledata,
-                            size: 28,
-                            color: AppColor.white,
-                          ),
-                          label: Text(
-                            'Sign in with Google',
-                            style: AppText.body(context).copyWith(color: AppColor.white),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AppColor.white),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            alignment: Alignment.center, // ⬅️ ini opsional tapi rapi
-                          ),
-                        ),
-                      )
                     ],
                   ),
                 ),
@@ -188,8 +151,6 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
     );
   }
-
-  /// ===== COMPONENTS =====
 
   Widget _label(BuildContext context, String text) {
     return Padding(
@@ -210,75 +171,10 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // Widget _input({bool obscure = false, bool isPassword = false}) {
-  //   return TextFormField(
-  //     obscureText: obscure,
-  //     validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-  //     decoration: InputDecoration(
-  //       filled: true,
-  //       fillColor: AppColor.white,
-  //       border: OutlineInputBorder(
-  //         borderRadius: _radius,
-  //         borderSide: BorderSide.none,
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  Widget _input({
-    bool obscure = false,
-    bool isPassword = false, // default false, biar form lama aman
-  }) {
-    if (isPassword) {
-      // Password field dengan show/hide
-      return StatefulBuilder(
-        builder: (context, setState) {
-          bool _obscureText = obscure;
-          return TextFormField(
-            obscureText: _obscureText,
-            validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: AppColor.white,
-              border: OutlineInputBorder(
-                borderRadius: _radius,
-                borderSide: BorderSide.none,
-              ),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.grey,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscureText = !_obscureText;
-                  });
-                },
-              ),
-            ),
-          );
-        },
-      );
-    } else {
-      // Field biasa, tetap kompatibel dengan form lama
-      return TextFormField(
-        obscureText: obscure,
-        validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: AppColor.white,
-          border: OutlineInputBorder(
-            borderRadius: _radius,
-            borderSide: BorderSide.none,
-          ),
-        ),
-      );
-    }
-  }
-
   Widget _genderDropdown() {
     return DropdownButtonFormField<String>(
       value: gender,
+      dropdownColor: AppColor.white,
       items: const [
         DropdownMenuItem(value: 'Female', child: Text('Female')),
         DropdownMenuItem(value: 'Male', child: Text('Male')),
@@ -296,100 +192,18 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 }
 
-/// ===== SMALL WIDGETS =====
-
-class _CountryCode extends StatelessWidget {
-  final BorderRadius radius;
-
-  const _CountryCode({required this.radius});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-      decoration: BoxDecoration(
-        color: AppColor.white,
-        borderRadius: radius,
-      ),
-      child: const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('🇮🇩', style: TextStyle(fontSize: 16)),
-          SizedBox(width: 4),
-          Text('+62', style: TextStyle(fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-}
-
-class _PrimaryButton extends StatelessWidget {
-  final String text;
-  final VoidCallback onPressed;
-  final bool outlined;
-  final FontWeight? fontWeight;
-  final Color? color;
-
-  const _PrimaryButton({
-    required this.text,
-    required this.onPressed,
-    this.outlined = false,
-    this.fontWeight,
-    this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: outlined
-          ? OutlinedButton(
-        onPressed: onPressed,
-        style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: AppColor.white),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding:
-          const EdgeInsets.symmetric(vertical: 14),
-        ),
-        child: Text(
-          text,
-          style: AppText.body(context)
-              .copyWith(color: AppColor.white),
-        ),
-      )
-          : ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color ?? AppColor.primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding:
-          const EdgeInsets.symmetric(vertical: 14),
-        ),
-        child: Text(
-          text,
-          style: AppText.body(context)
-              .copyWith(color: AppColor.white),
-        ),
-      ),
-    );
-  }
-}
-
-
 class InputField extends StatefulWidget {
   final bool obscure;
   final bool isPassword;
   final TextEditingController? controller;
+  final String? Function(String?)? customValidator;
 
   const InputField({
     super.key,
     this.obscure = false,
     this.isPassword = false,
     this.controller,
+    this.customValidator,
   });
 
   @override
@@ -410,10 +224,11 @@ class _InputFieldState extends State<InputField> {
     return TextFormField(
       controller: widget.controller,
       obscureText: widget.isPassword ? _obscureText : false,
-      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+      validator: widget.customValidator ??
+              (v) => v == null || v.isEmpty ? 'Required' : null,
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.white, // ganti sesuai AppColor.white
+        fillColor: AppColor.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -421,7 +236,9 @@ class _InputFieldState extends State<InputField> {
         suffixIcon: widget.isPassword
             ? IconButton(
           icon: Icon(
-            _obscureText ? Icons.visibility_off : Icons.visibility,
+            _obscureText
+                ? Icons.visibility_off
+                : Icons.visibility,
             color: Colors.grey,
           ),
           onPressed: () {
@@ -431,6 +248,67 @@ class _InputFieldState extends State<InputField> {
           },
         )
             : null,
+      ),
+    );
+  }
+}
+
+class _CountryCode extends StatelessWidget {
+  final BorderRadius radius;
+
+  const _CountryCode({required this.radius});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding:
+      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColor.white,
+        borderRadius: radius,
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('🇮🇩', style: TextStyle(fontSize: 16)),
+          SizedBox(width: 4),
+          Text('+62', style: TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+}
+
+class _PrimaryButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final Color? color;
+
+  const _PrimaryButton({
+    required this.text,
+    required this.onPressed,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color ?? AppColor.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding:
+          const EdgeInsets.symmetric(vertical: 14),
+        ),
+        child: Text(
+          text,
+          style:
+          AppText.body(context).copyWith(color: AppColor.white),
+        ),
       ),
     );
   }

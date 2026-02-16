@@ -1,166 +1,186 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/habit_provider.dart';
 import '../routes.dart';
 
-
-class HomePage2 extends StatelessWidget {
+class HomePage2 extends ConsumerWidget {
   const HomePage2({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final habitState = ref.watch(habitProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFFBDBDBD),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
+          child: habitState.when(
+            loading: () =>
+            const Center(child: CircularProgressIndicator()),
+            error: (e, _) =>
+                Center(child: Text(e.toString())),
+            data: (habits) {
+              final total = habits.length;
+              final completed =
+                  habits.where((h) => h.isCompleted).length;
+              final progress =
+              total == 0 ? 0.0 : completed / total;
 
-              /// progress bar
-              LinearProgressIndicator(
-                value: 0.6,
-                backgroundColor: Colors.grey.shade300,
-                valueColor:
-                const AlwaysStoppedAnimation<Color>(Colors.blue),
-              ),
-
-              const SizedBox(height: 24),
-
-              /// title
-              const Text(
-                "When you wanna us remind you?",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              /// reminder boxes (SAMA SEPERTI HOME_PAGE)
-              Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 1.1,
-                  children: const [
-                    ReminderBox(
-                      time: "07:00",
-                      label: "Morning",
-                    ),
-                    ReminderBox(
-                      time: "13:00",
-                      label: "Noon",
-                    ),
-                    ReminderBox(
-                      time: "19:00",
-                      label: "Evening",
-                      isWide: true,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              /// bottom buttons (STYLE SAMA HOME_PAGE)
-              Row(
+              return Column(
+                crossAxisAlignment:
+                CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: BorderSide.none,
-                        padding:
-                        const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(
-                          context,
-                          AppRoutes.homeSplashPage,
-                        );
-                      },
-                      child: const Text(
-                        "Skip",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        padding:
-                        const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(
-                          context,
-                          AppRoutes.homeSplashPage,
-                        );
-                      },
-                      child: const Text(
-                        "Proceed",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                  const SizedBox(height: 16),
 
-              const SizedBox(height: 20),
-            ],
+                  /// PROGRESS BAR
+                  LinearProgressIndicator(
+                    value: progress,
+                    backgroundColor:
+                    Colors.grey.shade300,
+                    valueColor:
+                    const AlwaysStoppedAnimation(
+                        Colors.blue),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Text(
+                    "$completed of $total completed",
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w500),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  const Text(
+                    "Your Habits",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  /// LIST HABITS
+                  Expanded(
+                    child: habits.isEmpty
+                        ? const Center(
+                      child: Text(
+                        "No habits yet 🥲",
+                        textAlign:
+                        TextAlign.center,
+                      ),
+                    )
+                        : ListView.builder(
+                      itemCount: habits.length,
+                      itemBuilder:
+                          (context, index) {
+                        final habit =
+                        habits[index];
+
+                        return Container(
+                          margin:
+                          const EdgeInsets
+                              .only(
+                              bottom:
+                              12),
+                          decoration:
+                          BoxDecoration(
+                            color:
+                            Colors.white,
+                            borderRadius:
+                            BorderRadius
+                                .circular(
+                                12),
+                          ),
+                          child: ListTile(
+                            leading:
+                            Checkbox(
+                              value: habit
+                                  .isCompleted,
+                              onChanged: (_) {
+                                ref
+                                    .read(
+                                    habitProvider
+                                        .notifier)
+                                    .toggleHabit(
+                                    habit.id);
+                              },
+                            ),
+                            title: Text(
+                              habit.title,
+                              style:
+                              TextStyle(
+                                decoration: habit
+                                    .isCompleted
+                                    ? TextDecoration
+                                    .lineThrough
+                                    : null,
+                              ),
+                            ),
+                            trailing:
+                            IconButton(
+                              icon:
+                              const Icon(
+                                  Icons
+                                      .delete),
+                              onPressed:
+                                  () {
+                                ref
+                                    .read(
+                                    habitProvider
+                                        .notifier)
+                                    .deleteHabit(
+                                    habit.id);
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  /// BACK BUTTON
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style:
+                      ElevatedButton.styleFrom(
+                        backgroundColor:
+                        Colors.black,
+                        padding:
+                        const EdgeInsets
+                            .symmetric(
+                            vertical:
+                            14),
+                      ),
+                      onPressed: () {
+                        Navigator
+                            .pushReplacementNamed(
+                          context,
+                          AppRoutes
+                              .homeSplashPage,
+                        );
+                      },
+                      child: const Text(
+                        "Finish",
+                        style: TextStyle(
+                            color:
+                            Colors.white),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+                ],
+              );
+            },
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// =======================
-/// Reminder Box (STYLE SAMA HabitCard)
-/// =======================
-class ReminderBox extends StatelessWidget {
-  final String time;
-  final String label;
-  final bool isWide;
-
-  const ReminderBox({
-    super.key,
-    required this.time,
-    required this.label,
-    this.isWide = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: isWide ? double.infinity : null,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            time,
-            style: const TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
       ),
     );
   }

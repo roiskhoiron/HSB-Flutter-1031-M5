@@ -14,25 +14,35 @@ class _UserPageState extends State<UserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('User Settings')),
-      body: Padding(
+      appBar: AppBar(
+        title: const Text('User Settings'),
+        centerTitle: true,
+      ),
+      body: ListView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            ListTile(
+        children: [
+          const SizedBox(height: 8),
+
+          /// DARK MODE SWITCH
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: Theme.of(context).cardColor,
+            ),
+            child: ListTile(
               leading: const Icon(Icons.brightness_6),
               title: const Text('Dark Mode'),
+              subtitle: const Text('Enable dark theme'),
               trailing: Switch(
                 value: isDarkMode,
                 onChanged: (val) {
                   themeNotifier.value =
                   val ? ThemeMode.dark : ThemeMode.light;
-                  setState(() {}); // agar toggle langsung update
                 },
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

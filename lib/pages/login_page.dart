@@ -13,10 +13,25 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
 
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
+
   void _continue() {
-    if (emailController.text.isEmpty) {
+    final email = emailController.text.trim();
+
+    if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Email tidak boleh kosong')),
+      );
+      return;
+    }
+
+    if (!email.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Format email tidak valid')),
       );
       return;
     }
@@ -29,84 +44,83 @@ class _LoginPageState extends State<LoginPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark
-          ? AppColor.darkBackground
-          : AppColor.lightBackground,
-
+      backgroundColor:
+      isDark ? AppColor.darkBackground : AppColor.lightBackground,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 4),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 12),
 
-              /// LOGO
-              Image.asset(
-                'assets/images/aebbbec190680b790fb1afab99e36740075f92f4.png',
-                width: 260,
-              ),
-
-              const SizedBox(height: 4),
-
-              /// REGISTER TEXT
-              Text(
-                "Didn't have account ?",
-                style: AppText.caption(context).copyWith(
-                  color: AppColor.black,
+                /// LOGO
+                Image.asset(
+                  'assets/images/aebbbec190680b790fb1afab99e36740075f92f4.png',
+                  width: 260,
                 ),
-              ),
-              const SizedBox(height: 4),
-              InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, AppRoutes.register);
-                },
-                child: Text(
-                  'Create one here!',
-                  style: AppText.link(context),
+
+                const SizedBox(height: 8),
+
+                /// REGISTER TEXT
+                Text(
+                  "Didn't have account?",
+                  style: AppText.caption(context)
+                      .copyWith(color: AppColor.black),
                 ),
-              ),
+                const SizedBox(height: 4),
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.register);
+                  },
+                  child: Text(
+                    'Create one here!',
+                    style: AppText.link(context),
+                  ),
+                ),
 
-              const SizedBox(height: 32),
+                const SizedBox(height: 32),
 
-              /// EMAIL FIELD
-              _EmailField(controller: emailController),
+                /// EMAIL FIELD
+                _EmailField(controller: emailController),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              /// CONTINUE BUTTON
-              _PrimaryButton(
-                text: 'Continue',
-                onPressed: _continue,
-              ),
+                /// CONTINUE BUTTON
+                _PrimaryButton(
+                  text: 'Continue',
+                  onPressed: _continue,
+                ),
 
-              const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-              /// OR DIVIDER
-              const _OrDivider(),
+                /// OR DIVIDER
+                const _OrDivider(),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              /// SOCIAL BUTTONS
-              const _SocialButton(
-                text: 'Continue with Google',
-                icon: Icons.g_mobiledata,
-                iconSize: 34,
-              ),
-              const SizedBox(height: 12),
-              const _SocialButton(
-                text: 'Continue with Apple',
-                icon: Icons.apple,
-                iconSize: 30,
-              ),
+                /// SOCIAL BUTTONS
+                const _SocialButton(
+                  text: 'Continue with Google',
+                  icon: Icons.g_mobiledata,
+                  iconSize: 34,
+                ),
+                const SizedBox(height: 12),
+                const _SocialButton(
+                  text: 'Continue with Apple',
+                  icon: Icons.apple,
+                  iconSize: 30,
+                ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              /// TERMS
-              const _TermsText(),
+                /// TERMS
+                const _TermsText(),
 
-              const SizedBox(height: 24),
-            ],
+                const SizedBox(height: 24),
+              ],
+            ),
           ),
         ),
       ),
@@ -114,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-/// Email Field
+/// EMAIL FIELD
 class _EmailField extends StatelessWidget {
   final TextEditingController controller;
 
@@ -124,12 +138,13 @@ class _EmailField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
+      keyboardType: TextInputType.emailAddress,
       style: AppText.body(context),
       decoration: InputDecoration(
         hintText: 'email@domain.com',
-        hintStyle: TextStyle(
+        hintStyle: const TextStyle(
           color: AppColor.black38,
-          fontFamily: 'Urbanist'
+          fontFamily: 'Urbanist',
         ),
         filled: true,
         fillColor: AppColor.white,
@@ -142,7 +157,7 @@ class _EmailField extends StatelessWidget {
   }
 }
 
-///Primary Button
+/// PRIMARY BUTTON
 class _PrimaryButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
@@ -174,7 +189,7 @@ class _PrimaryButton extends StatelessWidget {
   }
 }
 
-///Social Button
+/// SOCIAL BUTTON
 class _SocialButton extends StatelessWidget {
   final String text;
   final IconData icon;
@@ -203,7 +218,6 @@ class _SocialButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          overlayColor: AppColor.black.withOpacity(0.05), // ripple
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -212,7 +226,7 @@ class _SocialButton extends StatelessWidget {
             const SizedBox(width: 12),
             Text(
               text,
-              style: AppText.body(context), // aman
+              style: AppText.body(context),
             ),
           ],
         ),
@@ -221,32 +235,30 @@ class _SocialButton extends StatelessWidget {
   }
 }
 
-///Divider OR
+/// DIVIDER OR
 class _OrDivider extends StatelessWidget {
   const _OrDivider();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: const [
-        Expanded(child: Divider(
-            color: AppColor.grey,
-          )
+    return const Row(
+      children: [
+        Expanded(
+          child: Divider(color: AppColor.grey),
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8),
           child: Text('or'),
         ),
-        Expanded(child: Divider(
-          color: AppColor.grey,
-          )
+        Expanded(
+          child: Divider(color: AppColor.grey),
         ),
       ],
     );
   }
 }
 
-///Term Text
+/// TERMS TEXT
 class _TermsText extends StatelessWidget {
   const _TermsText();
 
@@ -256,24 +268,15 @@ class _TermsText extends StatelessWidget {
       TextSpan(
         style: AppText.caption(context),
         children: const [
-          TextSpan(
-            text: 'By clicking continue, you agree to our ',
-            style: TextStyle(fontWeight: FontWeight.normal)
-          ),
+          TextSpan(text: 'By clicking continue, you agree to our '),
           TextSpan(
             text: 'Terms of Service\n',
-            style: const TextStyle(
-                fontWeight: FontWeight.normal,
-                color: Colors.black,
-            ),
+            style: TextStyle(color: Colors.black),
           ),
           TextSpan(text: 'and '),
           TextSpan(
             text: 'Privacy Policy',
-            style: const TextStyle(
-                fontWeight: FontWeight.normal,
-                color: Colors.black,
-            ),
+            style: TextStyle(color: Colors.black),
           ),
         ],
       ),
