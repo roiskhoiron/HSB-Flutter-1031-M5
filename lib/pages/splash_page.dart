@@ -17,7 +17,7 @@ class SplashPage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            /// ===== TOP SECTION (LOGO) =====
+            /// TOP SECTION (LOGO)
             Expanded(
               flex: 6,
               child: Center(
@@ -29,7 +29,7 @@ class SplashPage extends StatelessWidget {
               ),
             ),
 
-            /// ===== BOTTOM CARD =====
+            /// BOTTOM CARD
             Expanded(
               flex: 4,
               child: Container(

@@ -1,25 +1,45 @@
 import 'package:flutter/material.dart';
-import '../models/habit.dart';
 
 class HabitCard extends StatelessWidget {
-  final Habit habit;
-  final VoidCallback onDelete;
+  final IconData icon;
+  final String label;
+  final bool isAlreadyAdded;
+  final VoidCallback? onTap;
 
   const HabitCard({
     super.key,
-    required this.habit,
-    required this.onDelete,
+    required this.icon,
+    required this.label,
+    required this.isAlreadyAdded,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ListTile(
-        title: Text(habit.title),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete),
-          onPressed: onDelete,
+    return GestureDetector(
+      onTap: isAlreadyAdded ? null : onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: isAlreadyAdded ? Colors.grey.shade300 : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 60,
+              color: isAlreadyAdded ? Colors.grey : Colors.black,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: isAlreadyAdded ? Colors.grey : Colors.black,
+              ),
+            ),
+          ],
         ),
       ),
     );

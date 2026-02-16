@@ -124,7 +124,7 @@ class _HomePageMainState extends ConsumerState<HomePageMain> {
   Widget build(BuildContext context) {
     final pages = [
       const _HomeContent(),
-      const SizedBox(), // dummy for add button
+      const SizedBox(),
       const UserPage(),
     ];
 
@@ -153,9 +153,7 @@ class _HomePageMainState extends ConsumerState<HomePageMain> {
   }
 }
 
-/// =======================
 /// HOME CONTENT
-/// =======================
 class _HomeContent extends ConsumerWidget {
   const _HomeContent();
 

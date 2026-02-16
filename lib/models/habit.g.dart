@@ -2,10 +2,6 @@
 
 part of 'habit.dart';
 
-// **************************************************************************
-// TypeAdapterGenerator
-// **************************************************************************
-
 class HabitAdapter extends TypeAdapter<Habit> {
   @override
   final int typeId = 0;

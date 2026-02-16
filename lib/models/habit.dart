@@ -14,13 +14,13 @@ class Habit {
   final bool isCompleted;
 
   @HiveField(3)
-  final DateTime date; // tanggal habit
+  final DateTime date;
 
   @HiveField(4)
-  final int hour; // jam
+  final int hour;
 
   @HiveField(5)
-  final int minute; // menit
+  final int minute;
 
   Habit({
     required this.id,

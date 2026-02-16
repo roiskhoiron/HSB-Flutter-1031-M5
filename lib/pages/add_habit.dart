@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/habit_provider.dart';
-import 'package:intl/intl.dart';
+import '../widgets/habit_text_fild.dart';
+import '../widgets/date_picker_button.dart';
+import '../widgets/time_picker_button.dart';
+import '../widgets/save_habit_button.dart';
 
 class AddHabitPage extends ConsumerStatefulWidget {
   const AddHabitPage({super.key});
@@ -15,7 +18,6 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
 
-  /// PICK DATE
   Future<void> _pickDate() async {
     final now = DateTime.now();
     final date = await showDatePicker(
@@ -24,27 +26,17 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
       firstDate: now,
       lastDate: DateTime(now.year + 5),
     );
-    if (date != null) {
-      setState(() {
-        selectedDate = date;
-      });
-    }
+    if (date != null) setState(() => selectedDate = date);
   }
 
-  /// PICK TIME
   Future<void> _pickTime() async {
     final time = await showTimePicker(
       context: context,
       initialTime: selectedTime ?? TimeOfDay.now(),
     );
-    if (time != null) {
-      setState(() {
-        selectedTime = time;
-      });
-    }
+    if (time != null) setState(() => selectedTime = time);
   }
 
-  /// SAVE HABIT
   void _saveHabit() async {
     final title = _habitController.text.trim();
     if (title.isEmpty || selectedDate == null || selectedTime == null) {
@@ -54,7 +46,6 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
       return;
     }
 
-    // Menambahkan habit lewat provider dengan named parameter
     final success = await ref.read(habitProvider.notifier).addHabitWithDateTime(
       title: title,
       date: selectedDate!,
@@ -63,14 +54,10 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
     );
 
     if (success) {
-      Navigator.pop(context); // kembali ke HomePage
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("$title added!")),
-      );
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("$title added!")));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Habit already exists')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Habit already exists')));
     }
   }
 
@@ -82,35 +69,13 @@ class _AddHabitPageState extends ConsumerState<AddHabitPage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            TextField(
-              controller: _habitController,
-              decoration: const InputDecoration(
-                labelText: 'Habit Name',
-              ),
-            ),
+            HabitTextField(controller: _habitController),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _pickDate,
-              child: Text(
-                selectedDate == null
-                    ? 'Select Date'
-                    : DateFormat.yMMMMd().format(selectedDate!),
-              ),
-            ),
+            DatePickerButton(selectedDate: selectedDate, onPressed: _pickDate),
             const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: _pickTime,
-              child: Text(
-                selectedTime == null
-                    ? 'Select Time'
-                    : selectedTime!.format(context),
-              ),
-            ),
+            TimePickerButton(selectedTime: selectedTime, onPressed: _pickTime),
             const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: _saveHabit,
-              child: const Text('Save Habit'),
-            ),
+            SaveHabitButton(onPressed: _saveHabit),
           ],
         ),
       ),

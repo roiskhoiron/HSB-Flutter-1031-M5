@@ -11,7 +11,7 @@ class HomeSplashPage extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            /// ===== BAGIAN ATAS =====
+            /// BAGIAN ATAS
             Expanded(
               flex: 7,
               child: Center(
@@ -38,7 +38,7 @@ class HomeSplashPage extends StatelessWidget {
               ),
             ),
 
-            /// ===== TOMBOL BAWAH =====
+            /// TOMBOL BAWAH
             Padding(
               padding: const EdgeInsets.fromLTRB(70, 10, 70, 70),
               child: SizedBox(

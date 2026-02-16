@@ -68,7 +68,7 @@ class HomePage2 extends ConsumerWidget {
                     child: habits.isEmpty
                         ? const Center(
                       child: Text(
-                        "No habits yet 🥲",
+                        "No habits yet",
                         textAlign:
                         TextAlign.center,
                       ),
