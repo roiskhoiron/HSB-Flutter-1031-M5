@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import '../main.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/theme_provider.dart';
 
-class UserPage extends StatefulWidget {
+class UserPage extends ConsumerWidget {
   const UserPage({super.key});
 
   @override
-  State<UserPage> createState() => _UserPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentMode = ref.watch(themeProvider);
+    final isDarkMode = currentMode == ThemeMode.dark;
 
-class _UserPageState extends State<UserPage> {
-  bool get isDarkMode => themeNotifier.value == ThemeMode.dark;
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('User Settings'),
@@ -36,8 +33,13 @@ class _UserPageState extends State<UserPage> {
               trailing: Switch(
                 value: isDarkMode,
                 onChanged: (val) {
-                  themeNotifier.value =
-                  val ? ThemeMode.dark : ThemeMode.light;
+                  ref
+                      .read(themeProvider.notifier)
+                      .setTheme(
+                    val
+                        ? ThemeMode.dark
+                        : ThemeMode.light,
+                  );
                 },
               ),
             ),
