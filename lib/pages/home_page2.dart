@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/habit_provider.dart';
 import '../routes.dart';
-
+// Indentasi/formatting yang sangat dalam (nested code) – perlu di-refactor.
 class HomePage2 extends ConsumerWidget {
   const HomePage2({super.key});
 
