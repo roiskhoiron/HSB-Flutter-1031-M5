@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mission_5_habbits/theme/app_color.dart';
 import '../routes.dart';
 import '../providers/habit_provider.dart';
 import '../widgets/habit_grid.dart';
@@ -12,7 +13,8 @@ class HomePage extends ConsumerWidget {
     final habitState = ref.watch(habitProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFBDBDBD), // seharusnya menggunakan AppColor
+      backgroundColor: AppColor.backgroundColor,
+      // const Color(0xFFBDBDBD), // seharusnya menggunakan AppColor
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),

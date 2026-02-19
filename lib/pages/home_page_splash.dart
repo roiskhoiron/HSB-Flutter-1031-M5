@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mission_5_habbits/theme/app_color.dart';
 import '../routes.dart';
 
 class HomeSplashPage extends StatelessWidget {
@@ -7,7 +8,7 @@ class HomeSplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFA7A7A7), // Hardcoded color seharusnya menggunakan AppColor
+      backgroundColor: AppColor.darkBackground, // Hardcoded color seharusnya menggunakan AppColor
       body: SafeArea(
         child: Column(
           children: [
