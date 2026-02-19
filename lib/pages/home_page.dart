@@ -12,7 +12,7 @@ class HomePage extends ConsumerWidget {
     final habitState = ref.watch(habitProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFBDBDBD),
+      backgroundColor: const Color(0xFFBDBDBD), // seharusnya menggunakan AppColor
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),

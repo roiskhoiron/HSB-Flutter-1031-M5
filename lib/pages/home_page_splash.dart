@@ -7,7 +7,7 @@ class HomeSplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFA7A7A7),
+      backgroundColor: const Color(0xFFA7A7A7), // Hardcoded color seharusnya menggunakan AppColor
       body: SafeArea(
         child: Column(
           children: [
