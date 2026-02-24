@@ -18,6 +18,10 @@ import 'pages/home_page_main.dart';
 
 import 'models/habit.dart'; // <- wajib import Habit
 
+// themeNotifier sebagai global variable – lebih baik dikelola melalui Riverpod provider.
+//{Inline Review: Gunakan provider untuk theme agar state management konsisten satu pola.}
+ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
