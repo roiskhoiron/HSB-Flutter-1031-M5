@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../routes.dart';
 import '../theme/app_color.dart';
 import '../theme/app_text.dart';
@@ -12,19 +13,23 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  bool isLoading = false; // untuk loading indicator
 
   @override
   void dispose() {
     emailController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
-  void _continue() {
+  void _login() async {
     final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
-    if (email.isEmpty) {
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email tidak boleh kosong')),
+        const SnackBar(content: Text('Email dan password tidak boleh kosong')),
       );
       return;
     }
@@ -36,7 +41,50 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    Navigator.pushReplacementNamed(context, AppRoutes.home);
+    setState(() => isLoading = true);
+
+    try {
+      // login dengan Firebase
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
+    } on FirebaseAuthException catch (e) {
+      String message = "Login gagal";
+      switch (e.code) {
+        case 'user-not-found':
+          message = "User tidak ditemukan";
+          break;
+        case 'wrong-password':
+          message = "Password salah";
+          break;
+        case 'invalid-email':
+          message = "Email tidak valid";
+          break;
+        case 'network-request-failed':
+          message = "Tidak ada koneksi internet";
+          break;
+        default:
+          message = "Login gagal: ${e.message}";
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Terjadi kesalahan: $e")),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
   }
 
   @override
@@ -87,10 +135,15 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 16),
 
-                /// CONTINUE BUTTON
+                /// PASSWORD FIELD
+                _PasswordField(controller: passwordController),
+
+                const SizedBox(height: 16),
+
+                /// LOGIN BUTTON
                 _PrimaryButton(
-                  text: 'Continue',
-                  onPressed: _continue,
+                  text: isLoading ? 'Loading...' : 'Login',
+                  onPressed: isLoading ? () {} : _login,
                 ),
 
                 const SizedBox(height: 24),
@@ -142,6 +195,35 @@ class _EmailField extends StatelessWidget {
       style: AppText.body(context),
       decoration: InputDecoration(
         hintText: 'email@domain.com',
+        hintStyle: const TextStyle(
+          color: AppColor.black38,
+          fontFamily: 'Urbanist',
+        ),
+        filled: true,
+        fillColor: AppColor.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+}
+
+/// PASSWORD FIELD
+class _PasswordField extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _PasswordField({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      obscureText: true,
+      style: AppText.body(context),
+      decoration: InputDecoration(
+        hintText: 'Password',
         hintStyle: const TextStyle(
           color: AppColor.black38,
           fontFamily: 'Urbanist',
