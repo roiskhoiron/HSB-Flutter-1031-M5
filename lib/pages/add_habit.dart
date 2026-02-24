@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/habit_provider.dart';
-import '../widgets/habit_text_fild.dart';
+import '../widgets/habit_text_field.dart';
 import '../widgets/date_picker_button.dart';
 import '../widgets/time_picker_button.dart';
 import '../widgets/save_habit_button.dart';
