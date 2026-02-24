@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../routes.dart';
 import '../theme/app_color.dart';
 import '../theme/app_text.dart';
@@ -32,13 +33,60 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
+  Future<void> _register() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    try {
+      // Create user in Firebase
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Tunggu sampai FirebaseAuth siap
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user != null && context.mounted) {
+        // Success, navigasi ke HomePage
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+      } else if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Terjadi kesalahan, coba lagi')),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      String message = 'Register gagal';
+      if (e.code == 'email-already-in-use') {
+        message = 'Email sudah terdaftar';
+      } else if (e.code == 'weak-password') {
+        message = 'Password terlalu lemah';
+      } else if (e.code == 'invalid-email') {
+        message = 'Email tidak valid';
+      }
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor:
-      isDark ? AppColor.darkBackground : AppColor.lightBackground,
+      backgroundColor: isDark ? AppColor.darkBackground : AppColor.lightBackground,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -69,8 +117,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       Center(
                         child: Text(
                           'Account Register',
-                          style: AppText.title(context)
-                              .copyWith(color: AppColor.white),
+                          style: AppText.title(context).copyWith(color: AppColor.white),
                         ),
                       ),
 
@@ -90,20 +137,12 @@ class _RegisterPageState extends State<RegisterPage> {
                         children: [
                           _CountryCode(radius: _radius),
                           const SizedBox(width: 8),
-                          Expanded(
-                            child: InputField(
-                              controller: mobileController,
-                            ),
-                          ),
+                          Expanded(child: InputField(controller: mobileController)),
                         ],
                       ),
 
                       _label(context, 'Password'),
-                      InputField(
-                        controller: passwordController,
-                        obscure: true,
-                        isPassword: true,
-                      ),
+                      InputField(controller: passwordController, obscure: true, isPassword: true),
 
                       _label(context, 'Confirm Password'),
                       InputField(
@@ -111,9 +150,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         obscure: true,
                         isPassword: true,
                         customValidator: (value) {
-                          if (value != passwordController.text) {
-                            return 'Password tidak sama';
-                          }
+                          if (value != passwordController.text) return 'Password tidak sama';
                           return null;
                         },
                       ),
@@ -123,12 +160,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       /// REGISTER BUTTON
                       _PrimaryButton(
                         text: 'Register',
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            Navigator.pushReplacementNamed(
-                                context, AppRoutes.home);
-                          }
-                        },
+                        onPressed: _register,
                       ),
 
                       const SizedBox(height: 16),
@@ -158,13 +190,9 @@ class _RegisterPageState extends State<RegisterPage> {
       child: RichText(
         text: TextSpan(
           text: text,
-          style:
-          AppText.caption(context).copyWith(color: AppColor.white),
+          style: AppText.caption(context).copyWith(color: AppColor.white),
           children: const [
-            TextSpan(
-              text: ' *',
-              style: TextStyle(color: Colors.red),
-            ),
+            TextSpan(text: ' *', style: TextStyle(color: Colors.red)),
           ],
         ),
       ),
@@ -198,13 +226,7 @@ class InputField extends StatefulWidget {
   final TextEditingController? controller;
   final String? Function(String?)? customValidator;
 
-  const InputField({
-    super.key,
-    this.obscure = false,
-    this.isPassword = false,
-    this.controller,
-    this.customValidator,
-  });
+  const InputField({super.key, this.obscure = false, this.isPassword = false, this.controller, this.customValidator});
 
   @override
   State<InputField> createState() => _InputFieldState();
@@ -224,8 +246,7 @@ class _InputFieldState extends State<InputField> {
     return TextFormField(
       controller: widget.controller,
       obscureText: widget.isPassword ? _obscureText : false,
-      validator: widget.customValidator ??
-              (v) => v == null || v.isEmpty ? 'Required' : null,
+      validator: widget.customValidator ?? (v) => v == null || v.isEmpty ? 'Required' : null,
       decoration: InputDecoration(
         filled: true,
         fillColor: AppColor.white,
@@ -235,17 +256,8 @@ class _InputFieldState extends State<InputField> {
         ),
         suffixIcon: widget.isPassword
             ? IconButton(
-          icon: Icon(
-            _obscureText
-                ? Icons.visibility_off
-                : Icons.visibility,
-            color: Colors.grey,
-          ),
-          onPressed: () {
-            setState(() {
-              _obscureText = !_obscureText;
-            });
-          },
+          icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
+          onPressed: () => setState(() => _obscureText = !_obscureText),
         )
             : null,
       ),
@@ -261,12 +273,8 @@ class _CountryCode extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding:
-      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-      decoration: BoxDecoration(
-        color: AppColor.white,
-        borderRadius: radius,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      decoration: BoxDecoration(color: AppColor.white, borderRadius: radius),
       child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -284,11 +292,7 @@ class _PrimaryButton extends StatelessWidget {
   final VoidCallback onPressed;
   final Color? color;
 
-  const _PrimaryButton({
-    required this.text,
-    required this.onPressed,
-    this.color,
-  });
+  const _PrimaryButton({required this.text, required this.onPressed, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -298,17 +302,10 @@ class _PrimaryButton extends StatelessWidget {
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: color ?? AppColor.primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding:
-          const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          padding: const EdgeInsets.symmetric(vertical: 14),
         ),
-        child: Text(
-          text,
-          style:
-          AppText.body(context).copyWith(color: AppColor.white),
-        ),
+        child: Text(text, style: AppText.body(context).copyWith(color: AppColor.white)),
       ),
     );
   }
