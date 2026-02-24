@@ -17,12 +17,14 @@ import 'theme/app_theme.dart';
 import 'pages/add_habit.dart';
 
 // themeNotifier sebagai global variable – lebih baik dikelola melalui Riverpod provider.
+//{Inline Review: Gunakan provider untuk theme agar state management konsisten satu pola.}
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
+  //{Inline Review: Tambahkan guard adapter registration untuk mencegah duplicate registration error.}
   Hive.registerAdapter(HabitAdapter());
   await Hive.openBox<Habit>('habitsBox');
 
