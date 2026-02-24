@@ -275,17 +275,116 @@ class _HomeContent extends ConsumerWidget {
                             ref.read(habitProvider.notifier).toggleHabit(habit.id);
                           },
                         ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () {
-                            ref.read(habitProvider.notifier).deleteHabit(habit.id);
-                          },
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            /// EDIT BUTTON
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () {
+                                _showEditDialog(context, ref, habit);
+                              },
+                            ),
+
+                            /// DELETE BUTTON
+                            IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () {
+                                ref.read(habitProvider.notifier).deleteHabit(habit.id);
+                              },
+                            ),
+                          ],
                         ),
                       );
                     },
                   );
                 },
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  void _showEditDialog(
+      BuildContext context,
+      WidgetRef ref,
+      dynamic habit,
+      ) {
+    final controller = TextEditingController(text: habit.title);
+    DateTime selectedDate = habit.date;
+    TimeOfDay selectedTime =
+    TimeOfDay(hour: habit.hour, minute: habit.minute);
+
+    showDialog(
+      context: context,
+      builder: (_) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text("Edit Habit"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  hintText: "Edit nama habit",
+                ),
+              ),
+              const SizedBox(height: 12),
+              ListTile(
+                title: Text(
+                  DateFormat.yMMMMd().format(selectedDate),
+                ),
+                trailing: const Icon(Icons.calendar_today),
+                onTap: () async {
+                  final now = DateTime.now();
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: now.subtract(const Duration(days: 365)),
+                    lastDate: DateTime(now.year + 5),
+                  );
+                  if (date != null) {
+                    setState(() => selectedDate = date);
+                  }
+                },
+              ),
+              ListTile(
+                title: Text(selectedTime.format(context)),
+                trailing: const Icon(Icons.access_time),
+                onTap: () async {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime: selectedTime,
+                  );
+                  if (time != null) {
+                    setState(() => selectedTime = time);
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final newTitle = controller.text.trim();
+                if (newTitle.isEmpty) return;
+
+                await ref.read(habitProvider.notifier).editHabit(
+                  id: habit.id,
+                  newTitle: newTitle,
+                  newDate: selectedDate,
+                  newHour: selectedTime.hour,
+                  newMinute: selectedTime.minute,
+                );
+
+                if (context.mounted) Navigator.pop(context);
+              },
+              child: const Text("Save"),
             ),
           ],
         ),

@@ -62,4 +62,30 @@ class HabitNotifier extends Notifier<AsyncValue<List<Habit>>> {
     await _box.put(id, updated);
     state = AsyncData(_box.values.toList());
   }
+
+  Future<void> editHabit({
+  required String id,
+  required String newTitle,
+  required DateTime newDate,
+  required int newHour,
+  required int newMinute,
+}) async {
+  final habit = _box.get(id);
+  if (habit == null) return;
+
+  final trimmedTitle = newTitle.trim();
+  if (trimmedTitle.isEmpty) return;
+
+  final updatedHabit = habit.copyWith(
+    title: trimmedTitle,
+    date: newDate,
+    hour: newHour,
+    minute: newMinute,
+  );
+
+  await _box.put(id, updatedHabit);
+
+  // refresh state
+  state = AsyncData(_box.values.toList());
+}
 }
